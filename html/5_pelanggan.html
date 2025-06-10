@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Keranjang - SeraQ</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: linear-gradient(to bottom, #000d1a, #003366, #0055cc);
+      color: white;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .cart-container {
+      background-color: #111a4c;
+      width: 100%;
+      max-width: 420px;
+      border-radius: 20px;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+      overflow: hidden;
+    }
+
+    .header {
+      padding: 20px;
+      font-size: 22px;
+      font-weight: bold;
+      text-align: center;
+      border-bottom: 1px solid #00bfff;
+    }
+
+    .cart-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 20px;
+      border-bottom: 1px solid #1e3a8a;
+    }
+
+    .item-info {
+      flex: 1;
+    }
+
+    .item-name {
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    .item-desc {
+      font-size: 14px;
+      color: #d0d0d0;
+    }
+
+    .item-price {
+      font-size: 14px;
+      font-weight: bold;
+      color: #00ccff;
+    }
+
+    .item-qty {
+      font-size: 14px;
+      margin-top: 5px;
+      color: #ccc;
+    }
+
+    .total-section {
+      padding: 20px;
+      font-size: 18px;
+      font-weight: bold;
+      background-color: #1e3a8a;
+      text-align: right;
+    }
+
+    .payment-section {
+      padding: 20px;
+      border-top: 1px solid #00bfff;
+    }
+
+    .payment-label {
+      font-size: 16px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .payment-options {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .payment-option {
+      background-color: #00bfff;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background-color 0.2s ease;
+    }
+
+    .payment-option:hover {
+      background-color: #009acd;
+    }
+
+    .btn-bayar {
+      width: 100%;
+      padding: 16px;
+      border: none;
+      border-top: 1px solid #00bfff;
+      background-color: #00ccff;
+      font-size: 18px;
+      font-weight: bold;
+      color: white;
+      cursor: pointer;
+      border-radius: 0 0 20px 20px;
+    }
+
+    .btn-bayar:hover {
+      background-color: #009acd;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="cart-container">
+    <div class="header">Keranjang Kamu</div>
+
+    <?php if (empty($cart_items)): ?>
+        <p style="padding: 20px; text-align: center;">Keranjang kosong.</p>
+    <?php else: ?>
+        <?php foreach ($cart_items as $item): ?>
+            <div class="cart-item">
+                <div class="item-info">
+                    <div class="item-name"><?= htmlspecialchars($item['nama_menu']) ?></div>
+                    <?php if (!empty($item['catatan'])): ?>
+                        <div class="item-desc">Keterangan: <?= htmlspecialchars($item['catatan']) ?></div>
+                    <?php endif; ?>
+                    <div class="item-qty">x<?= htmlspecialchars($item['qty']) ?></div>
+                </div>
+                <div class="item-price">Rp<?= number_format($item['harga'] * $item['qty'], 0, ',', '.') ?></div>
+            </div>
+        <?php endforeach; ?>
+    <?php endif; ?>
+
+    <div class="total-section">Total: Rp<?= number_format($total_harga, 0, ',', '.') ?></div>
+
+    
+    <form action="process_order.php" method="POST">
+        <div class="payment-section">
+            <div class="payment-label">Pilih Metode Pembayaran:</div>
+            <div class="payment-options">
+                <button type="button" class="payment-option" data-method="Tunai">Tunai</button>
+                <button type="button" class="payment-option" data-method="QRIS">QRIS</button>
+                <button type="button" class="payment-option" data-method="Transfer">Transfer</button>
+                <input type="hidden" name="metode_pembayaran" id="metode_pembayaran" value=""> </div>
+        </div>
+
+        <input type="hidden" name="total_harga" value="<?= htmlspecialchars($total_harga) ?>">
+
+        <button type="submit" class="btn-bayar" name="konfirmasi_pesanan">Bayar Sekarang</button>
+    </form>
+  </div>
+
+<script>
+    // JavaScript untuk memilih metode pembayaran
+    document.addEventListener('DOMContentLoaded', function() {
+        const paymentOptions = document.querySelectorAll('.payment-option');
+        const metodePembayaranInput = document.getElementById('metode_pembayaran');
+
+        paymentOptions.forEach(button => {
+            button.addEventListener('click', function() {
+                // Hapus kelas 'selected' dari semua tombol
+                paymentOptions.forEach(btn => btn.classList.remove('selected'));
+                // Tambahkan kelas 'selected' ke tombol yang diklik
+                this.classList.add('selected');
+                // Atur nilai input hidden
+                metodePembayaranInput.value = this.dataset.method;
+            });
+        });
+    });
+</script>
+</body>
+</html>
+
+

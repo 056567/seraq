@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard Admin - SeraQ</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: linear-gradient(to bottom, #000d1a, #003366, #0055cc);
+      color: white;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 30px 10px;
+    }
+
+    .box-container {
+      background-color: #111a4c;
+      width: 100%;
+      max-width: 420px;
+      border-radius: 16px;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+      padding: 24px 20px;
+      text-align: center;
+    }
+
+    .profile-pic {
+      width: 110px;
+      height: 110px;
+      background-color: #00ccff;
+      border-radius: 50%;
+      margin: 20px auto 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 42px;
+      color: black;
+    }
+
+    .username {
+      background-color: #0099cc;
+      color: white;
+      border-radius: 25px;
+      padding: 10px 28px;
+      margin-bottom: 25px;
+      font-weight: bold;
+      display: inline-block;
+    }
+
+    .menu-btn {
+      background-color: #00ccff;
+      border: none;
+      border-radius: 12px;
+      padding: 14px 20px;
+      margin-bottom: 15px;
+      width: 100%;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: background-color 0.3s ease;
+    }
+
+    .menu-btn:hover {
+      background-color: #009acd;
+    }
+
+    .menu-icon {
+      font-size: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="dashboard-container">
+    <!-- Navbar simulasi -->
+    <div class="p">
+    </div>
+
+    <!-- Profil -->
+    <div class="profile-pic">👤</div>
+    <a href="profile_warung.php" style="text-decoration: none;">
+    <button class="username"><?php echo $nama_warung; ?></button>
+    </a>
+
+    <!-- Tombol Menu -->
+    <a href="3_owner.php" class="kelola_menu">
+        <button class="menu-btn"><span class="menu-icon">📋</span>Kelola menu</button>
+    </a>
+    <a href="4_owner.php" class="lihat_transaksi">
+        <button class="menu-btn"><span class="menu-icon">💰</span>Lihat Transaksi</button>
+    </a>
+    <a href="5_owner.php" class="pesanan">
+        <button class="menu-btn"><span class="menu-icon">📄</span>Pesanan</button>
+    </a>
+    <a href="6_owner.php" class="laporan">
+        <button class="menu-btn"><span class="menu-icon">💼</span>Laporan</button>
+    </a>
+  </div>
+</body>
+</html>
+
+

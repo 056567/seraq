@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pesanan Masuk - SeraQ</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: linear-gradient(to bottom, #000d1a, #003366, #0055cc);
+      color: white;
+      min-height: 100vh;
+      padding: 20px 16px 80px;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 24px;
+      font-size: 22px;
+    }
+
+    .kategori-pesanan {
+      margin-bottom: 32px;
+    }
+
+    .kategori-pesanan h3 {
+      font-size: 18px;
+      margin-bottom: 12px;
+      border-bottom: 2px solid #ffffff33;
+      padding-bottom: 4px;
+    }
+
+    .order-card {
+      background-color: #111a4c;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 18px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+
+    .order-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+
+    .menu-list {
+      margin: 10px 0;
+      padding-left: 16px;
+      font-size: 13px;
+      color: #dddddd;
+    }
+
+    .status {
+      font-size: 13px;
+      padding: 6px 10px;
+      border-radius: 8px;
+      display: inline-block;
+      margin-top: 6px;
+      font-weight: bold;
+    }
+
+    .menunggu {
+      background-color: #f39c12;
+      color: black;
+    }
+
+    .proses {
+      background-color: #3498db;
+      color: white;
+    }
+
+    .selesai {
+      background-color: #2ecc71;
+      color: black;
+    }
+
+    .ditolak {
+      background-color: #e74c3c;
+      color: white;
+    }
+
+    .action-group {
+      display: flex;
+      gap: 10px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
+
+    .aksi-btn {
+      background-color: #00ccff;
+      color: black;
+      padding: 10px 14px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: bold;
+      transition: background-color 0.3s ease;
+    }
+
+    .aksi-btn:hover {
+      background-color: #009acd;
+    }
+
+    .btn-red {
+      background-color: #e74c3c;
+      color: white;
+    }
+
+    .btn-red:hover {
+      background-color: #c0392b;
+    }
+
+    .btn-green {
+      background-color: #2ecc71;
+      color: black;
+    }
+
+    .btn-green:hover {
+      background-color: #27ae60;
+    }
+
+    .detail-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0,0,0,0.7);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .detail-box {
+      background-color: #112b66;
+      padding: 20px;
+      border-radius: 14px;
+      width: 90%;
+      max-width: 400px;
+    }
+
+    .back-btn {
+      margin-top: 20px;
+      background-color: transparent;
+      border: 1px solid #ccc;
+      color: white;
+      padding: 8px 14px;
+      border-radius: 10px;
+      cursor: pointer;
+      display: block;
+      width: 100%;
+    }
+
+    .keterangan {
+      margin-top: 10px;
+      font-size: 13px;
+      background-color: #001b3a;
+      padding: 8px;
+      border-radius: 8px;
+      color: #cccccc;
+    }
+
+    .total {
+      margin-top: 8px;
+      font-weight: bold;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <h2>Pesanan Masuk</h2>
+
+  <!-- Kategori: Menunggu Konfirmasi -->
+  <div class="kategori-pesanan">
+    <h3>🕐 Pesanan Baru</h3>
+    <div id="list-menunggu"></div>
+  </div>
+
+  <!-- Kategori: Diproses -->
+  <div class="kategori-pesanan">
+    <h3>🔄 Sedang Diproses</h3>
+    <div id="list-proses"></div>
+  </div>
+
+  <!-- Kategori: Ditolak -->
+  <div class="kategori-pesanan">
+    <h3>❌ Ditolak</h3>
+    <div id="list-ditolak"></div>
+  </div>
+
+  <!-- Overlay Detail -->
+  <div class="detail-overlay" id="overlay-detail">
+    <div class="detail-box">
+      <div class="order-header">
+        <div id="detail-id">ID: </div>
+        <div id="detail-waktu">Waktu</div>
+      </div>
+      <div class="menu-list" id="detail-menu"></div>
+      <div class="total" id="detail-total"></div>
+      <div class="keterangan" id="detail-keterangan"></div>
+      <div class="status" id="detail-status"></div>
+      <div class="action-group" id="detail-actions"></div>
+      <button class="back-btn" onclick="tutupDetail()">← Kembali</button>
+    </div>
+  </div>
+
+  <script>
+    const pesananData = {
+      '3001': {
+        waktu: '01 Jun 2025, 19:10',
+        menu: `• Nasi Goreng x1 - Rp18.000<br>• Es Teh x2 - Rp6.000`,
+        total: 'Rp30.000',
+        keterangan: 'Tolong jangan terlalu pedas ya kak, makasih!',
+        status: 'menunggu'
+      },
+      '3002': {
+        waktu: '01 Jun 2025, 19:15',
+        menu: `• Mie Ayam x2 - Rp24.000<br>• Teh Manis Hangat x1 - Rp4.000`,
+        total: 'Rp28.000',
+        keterangan: 'Tanpa sambal ya.',
+        status: 'menunggu'
+      },
+      '3003': {
+        waktu: '01 Jun 2025, 19:20',
+        menu: `• Sate Ayam x1 - Rp25.000<br>• Air Mineral x1 - Rp5.000`,
+        total: 'Rp30.000',
+        keterangan: 'Bungkus terpisah ya.',
+        status: 'menunggu'
+      }
+    };
+
+    let pesananDipilih = "";
+
+    function renderPesanan() {
+      document.getElementById("list-menunggu").innerHTML = "";
+      document.getElementById("list-proses").innerHTML = "";
+      document.getElementById("list-ditolak").innerHTML = "";
+
+      for (let id in pesananData) {
+        const data = pesananData[id];
+        const card = document.createElement("div");
+        card.className = "order-card";
+        card.id = "pesanan-" + id;
+        card.innerHTML = `
+          <div class="order-header">
+            <div>ID: ORD-${id}</div>
+            <div>${data.waktu}</div>
+          </div>
+          <div class="menu-list">${data.menu.replace(/ - Rp[\d.]+/g, '')}</div>
+          <div class="status ${data.status}" id="status-${id}">${statusText(data.status)}</div>
+          <div class="action-group" id="actions-${id}">
+            ${data.status === "menunggu" ? `<button class="aksi-btn" onclick="lihatDetail('${id}')">Lihat Detail</button>` :
+              data.status === "proses" ? `<button class="aksi-btn" onclick="selesaikanPesanan('${id}')">Tandai Selesai</button>` : ``}
+          </div>
+        `;
+
+        const containerId = `list-${data.status}`;
+        document.getElementById(containerId).appendChild(card);
+      }
+    }
+
+    function statusText(kode) {
+      return {
+        menunggu: "Menunggu Konfirmasi",
+        proses: "Dalam Proses",
+        selesai: "Selesai",
+        ditolak: "Pesanan Ditolak"
+      }[kode];
+    }
+
+    function lihatDetail(id) {
+      pesananDipilih = id;
+      const data = pesananData[id];
+
+      document.getElementById("detail-id").innerText = "ID: ORD-" + id;
+      document.getElementById("detail-waktu").innerText = data.waktu;
+      document.getElementById("detail-menu").innerHTML = data.menu;
+      document.getElementById("detail-total").innerText = "Total: " + data.total;
+      document.getElementById("detail-keterangan").innerHTML = "📝 Keterangan: " + data.keterangan;
+      document.getElementById("detail-status").className = "status " + data.status;
+      document.getElementById("detail-status").innerText = statusText(data.status);
+
+      if (data.status === "menunggu") {
+        document.getElementById("detail-actions").innerHTML = `
+          <button class="aksi-btn btn-green" onclick="terimaPesanan('${id}')">Terima</button>
+          <button class="aksi-btn btn-red" onclick="tolakPesanan('${id}')">Tolak</button>
+        `;
+      } else if (data.status === "proses") {
+        document.getElementById("detail-actions").innerHTML = `
+          <button class="aksi-btn" onclick="selesaikanPesanan('${id}')">Tandai Selesai</button>
+        `;
+      } else {
+        document.getElementById("detail-actions").innerHTML = ``;
+      }
+
+      document.getElementById("overlay-detail").style.display = "flex";
+    }
+
+    function tutupDetail() {
+      document.getElementById("overlay-detail").style.display = "none";
+    }
+
+    function terimaPesanan(id) {
+      pesananData[id].status = "proses";
+      renderPesanan();
+      tutupDetail();
+    }
+
+    function tolakPesanan(id) {
+      pesananData[id].status = "ditolak";
+      renderPesanan();
+      tutupDetail();
+    }
+
+    function selesaikanPesanan(id) {
+      pesananData[id].status = "selesai";
+      renderPesanan();
+    }
+
+    renderPesanan();
+  </script>
+</body>
+</html>

@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Laporan Keuangan - SeraQ</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: linear-gradient(to bottom, #000d1a, #003366, #0055cc);
+      color: white;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 16px;
+      font-size: 22px;
+    }
+
+    .filter-group {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      padding: 8px 14px;
+      border: none;
+      border-radius: 8px;
+      background-color: #00ccff;
+      color: black;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .filter-btn.active {
+      background-color: #009acd;
+      color: white;
+    }
+
+    .chart-container {
+      width: 100%;
+      max-width: 400px;
+      margin: 0 auto 24px;
+      background-color: #112b66;
+      padding: 12px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+
+    .summary {
+      text-align: center;
+      font-weight: bold;
+      font-size: 16px;
+      margin-bottom: 20px;
+    }
+
+    .income-list {
+      max-width: 500px;
+      margin: 0 auto;
+      background-color: #111a4c;
+      padding: 16px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+
+    .income-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      font-size: 14px;
+      border-bottom: 1px solid #334;
+      padding-bottom: 4px;
+    }
+
+    .income-item:last-child {
+      border-bottom: none;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Laporan Keuangan</h2>
+
+  <div class="filter-group">
+    <button class="filter-btn active" onclick="setFilter('harian', this)">Harian</button>
+    <button class="filter-btn" onclick="setFilter('mingguan', this)">Mingguan</button>
+    <button class="filter-btn" onclick="setFilter('bulanan', this)">Bulanan</button>
+    <button class="filter-btn" onclick="setFilter('tahunan', this)">Tahunan</button>
+  </div>
+
+  <div class="chart-container">
+    <canvas id="incomeChart" height="200"></canvas>
+  </div>
+
+  <div class="summary" id="totalIncome">
+    Total Pemasukan Hari Ini: Rp 150.000
+  </div>
+
+  <div class="income-list" id="incomeDetails"></div>
+
+  <script>
+    const chartData = {
+      harian: {
+        labels: ["Mie Ayam", "Nasi Goreng", "Bakso Super", "Es Teh", "Sate Ayam"],
+        data: [28000, 45000, 40000, 24000, 25000],
+        detail: [
+          ["Mie Ayam x2", 28000],
+          ["Nasi Goreng x3", 45000],
+          ["Bakso Super x2", 40000],
+          ["Es Teh x4", 24000],
+          ["Sate Ayam x1", 25000],
+        ],
+        total: "Rp 150.000"
+      },
+      mingguan: {
+        labels: ["Sen", "Sel", "Rab", "Kam", "Jum", "Sab", "Min"],
+        data: [150000, 130000, 170000, 190000, 210000, 200000, 180000],
+        detail: [
+          ["Senin", 150000],
+          ["Selasa", 130000],
+          ["Rabu", 170000],
+          ["Kamis", 190000],
+          ["Jumat", 210000],
+          ["Sabtu", 200000],
+          ["Minggu", 180000],
+        ],
+        total: "Rp 1.230.000"
+      },
+      bulanan: {
+        labels: ["Minggu 1", "Minggu 2", "Minggu 3", "Minggu 4"],
+        data: [500000, 630000, 580000, 670000],
+        detail: [
+          ["Minggu 1", 500000],
+          ["Minggu 2", 630000],
+          ["Minggu 3", 580000],
+          ["Minggu 4", 670000],
+        ],
+        total: "Rp 2.380.000"
+      },
+      tahunan: {
+        labels: ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun"],
+        data: [1800000, 2000000, 1750000, 2200000, 2100000, 1500000],
+        detail: [
+          ["Januari", 1800000],
+          ["Februari", 2000000],
+          ["Maret", 1750000],
+          ["April", 2200000],
+          ["Mei", 2100000],
+          ["Juni", 1500000],
+        ],
+        total: "Rp 11.350.000"
+      }
+    };
+
+    const ctx = document.getElementById('incomeChart').getContext('2d');
+    let incomeChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: chartData.harian.labels,
+        datasets: [{
+          label: 'Pemasukan',
+          data: chartData.harian.data,
+          borderColor: '#00ccff',
+          backgroundColor: 'rgba(0, 204, 255, 0.2)',
+          fill: true,
+          tension: 0.4
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: false }
+        },
+        scales: {
+          y: {
+            ticks: {
+              callback: value => 'Rp ' + value.toLocaleString('id-ID')
+            }
+          }
+        }
+      }
+    });
+
+    function setFilter(type, button) {
+      // Update button highlight
+      document.querySelectorAll(".filter-btn").forEach(btn => btn.classList.remove("active"));
+      button.classList.add("active");
+
+      const selected = chartData[type];
+
+      // Update chart
+      incomeChart.data.labels = selected.labels;
+      incomeChart.data.datasets[0].data = selected.data;
+      incomeChart.update();
+
+      // Update summary
+      document.getElementById("totalIncome").innerText = "Total Pemasukan " + capitalize(type) + ": " + selected.total;
+
+      // Update details
+      const detailHTML = selected.detail.map(item => `
+        <div class="income-item">
+          <span>${item[0]}</span>
+          <span>Rp ${item[1].toLocaleString('id-ID')}</span>
+        </div>
+      `).join("");
+      document.getElementById("incomeDetails").innerHTML = detailHTML;
+    }
+
+    function capitalize(text) {
+      return text.charAt(0).toUpperCase() + text.slice(1);
+    }
+
+    // First load
+    setFilter('harian', document.querySelector(".filter-btn.active"));
+  </script>
+
+</body>
+</html>

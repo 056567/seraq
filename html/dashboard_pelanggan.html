@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Daftar Warung - SeraQ</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(to bottom, #000d1a, #003366, #0047ab);
+      color: white;
+      min-height: 100vh;
+    }
+
+    .header {
+      background-color: #00c8f0;
+      padding: 20px;
+      text-align: left;
+      font-weight: bold;
+      font-size: 18px;
+    }
+
+    .container {
+      padding: 16px;
+    }
+
+    .warung-name {
+      display: flex;
+      align-items: center;
+      background-color: rgba(255, 255, 255, 0.05);
+      padding: 12px;
+      border-radius: 12px;
+      margin-bottom: 14px;
+    }
+
+    .warung-logo {
+      width: 60px;
+      height: 60px;
+      object-fit: cover;
+      border-radius: 16px;
+      margin-right: 12px;
+      flex-shrink: 0;
+      border: 2px solid #ccc;
+      background-color: #ccc;
+    }
+
+    .warung-info h4 {
+      margin-bottom: 4px;
+      font-size: 16px;
+      color: #ffffff;
+    }
+
+    .warung-info p {
+      margin-bottom: 2px;
+      font-size: 13px;
+      color: #dddddd;
+    }
+
+    .rating {
+      font-size: 12px;
+      color: #ffc107;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">Daftar Warung</div>
+
+  <div class="container">
+    <!-- Warung 1 -->
+    <a href="pelanggan3.php" style="text-decoration: none;">
+    <div class="warung-name">
+      <img src="image/image.png" alt="Warung 1" class="warung-logo">
+      <div class="warung-info">
+        <h4><?php echo $nama_warung; ?></h4>
+        <p>Deskripsi</p>
+        <div class="rating">4.5⭐</div>
+      </div>
+    </div>
+    </a>
+
+    <!-- Warung 2 -->
+    <a href="pelanggan3.php" style="text-decoration: none;">
+    <div class="warung-name">
+      <img src="img/warung2.jpg" alt="Warung 2" class="warung-logo">
+      <div class="warung-info">
+        <h4><?php echo $nama_warung; ?></h4>
+        <p>Deskripsi</p>
+        <div class="rating">4.7⭐</div>
+      </div>
+    </div>
+    </a>
+
+    <!-- Warung 3 -->
+    <a href="pelanggan3.php" style="text-decoration: none;">
+    <div class="warung-name">
+      <img src="img/warung3.jpg" alt="Warung 3" class="warung-logo">
+      <div class="warung-info">
+        <h4><?php echo $nama_warung; ?></h4>
+        <p>Deskripsi</p>
+        <div class="rating">4.6⭐</div>
+      </div>
+    </div>
+    </a>
+
+    <!-- Warung 4 -->
+     <a href="pelanggan3.php" style="text-decoration: none;">
+    <div class="warung-name">
+      <img src="img/warung4.jpg" alt="Warung 4" class="warung-logo">
+      <div class="warung-info">
+        <h4><?php echo $nama_warung; ?></h4>
+        <p>Deskripsi</p>
+        <div class="rating">4.4⭐</div>
+      </div>
+    </div>
+  </div>
+  </a>
+
+</body>
+</html>
+

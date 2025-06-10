@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Kelola Menu - SeraQ</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: linear-gradient(to bottom, #000d1a, #003366, #0055cc);
+      color: white;
+      min-height: 100vh;
+      padding: 20px 16px 80px;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 24px;
+      font-size: 22px;
+    }
+
+    .menu-card {
+      background-color: #111a4c;
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      margin-bottom: 16px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+
+    .menu-img {
+      width: 60px;
+      height: 60px;
+      border-radius: 12px;
+      background-color: #ccc;
+      object-fit: cover;
+      margin-right: 16px;
+      border: 2px solid #00c8f0;
+    }
+
+    .menu-info {
+      flex: 1;
+    }
+
+    .menu-info h4,
+    .menu-info p,
+    .menu-info .desc {
+      margin-bottom: 4px;
+    }
+
+    .menu-info h4 {
+      font-size: 15px;
+    }
+
+    .menu-info p {
+      font-size: 13px;
+      color: #ccc;
+    }
+
+    .menu-info .desc {
+      font-size: 12px;
+      color: #aaa;
+      font-style: italic;
+    }
+
+    input.edit-name,
+    input.edit-price,
+    textarea.edit-desc {
+      font-size: 15px;
+      padding: 4px 6px;
+      width: 100%;
+      margin-bottom: 6px;
+      border-radius: 6px;
+      border: none;
+      outline: none;
+      resize: vertical;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    .status-btn, .edit-btn, .save-btn {
+      background-color: #00ccff;
+      color: black;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      margin-left: 8px;
+      white-space: nowrap;
+    }
+
+    .status-btn:hover,
+    .edit-btn:hover,
+    .save-btn:hover {
+      background-color: #00b0d0;
+    }
+
+    .sold-out {
+      background-color: #e74c3c;
+      color: white;
+    }
+
+    .sold-out:hover {
+      background-color: #c0392b;
+    }
+
+    .button-group {
+      display: flex;
+      align-items: center;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Kelola Menu Warung</h2>
+   <?php if ($result && mysqli_num_rows($result) > 0): ?>
+    <?php while ($row = mysqli_fetch_assoc($result)): 
+      $id = $row['id'] ?? '';
+      $nama = $row['nama_menu'] ?? 'Nama Menu';
+      $harga = $row['harga'] ?? 0;
+      $deskripsi = $row['deskripsi'] ?? 'Deskripsi menu';
+      $gambar = $row['gambar'] ?? 'default.jpg';
+      $status = $row['status'] ?? 'Tersedia';
+    ?>
+      <div class="menu-card" data-id="<?= $id ?>">
+        <img src="../img/menu/<?= htmlspecialchars($gambar) ?>" class="menu-img" alt="<?= htmlspecialchars($nama) ?>">
+        <div class="menu-info">
+          <h4><?= htmlspecialchars($nama) ?></h4>
+          <p>Rp <?= number_format($harga, 0, ',', '.') ?></p>
+          <div class="desc"><?= htmlspecialchars($deskripsi) ?></div>
+        </div>
+        <div class="button-group">
+          <button class="status-btn <?= $status === 'Habis' ? 'sold-out' : '' ?>">
+            <?= $status ?>
+          </button>
+          <button class="edit-btn">Edit</button>
+        </div>
+      </div>
+    <?php endwhile; ?>
+  <?php else: ?>
+    <p style="text-align: center; color: #ccc;">Belum ada menu terdaftar</p>
+  <?php endif; ?>
+
+
+  <script>
+    document.querySelectorAll('.edit-btn').forEach(button => {
+      button.addEventListener('click', () => {
+        const menuCard = button.closest('.menu-card');
+        const menuInfo = menuCard.querySelector('.menu-info');
+        const h4 = menuInfo.querySelector('h4');
+        const p = menuInfo.querySelector('p');
+        const descDiv = menuInfo.querySelector('.desc');
+
+        if (button.textContent === 'Edit') {
+          // Ganti teks dengan input / textarea
+          const inputName = document.createElement('input');
+          inputName.type = 'text';
+          inputName.value = h4.textContent;
+          inputName.className = 'edit-name';
+
+          const inputPrice = document.createElement('input');
+          inputPrice.type = 'text';
+          inputPrice.value = p.textContent;
+          inputPrice.className = 'edit-price';
+
+          const textareaDesc = document.createElement('textarea');
+          textareaDesc.className = 'edit-desc';
+          textareaDesc.rows = 3;
+          textareaDesc.value = descDiv ? descDiv.textContent : '';
+
+          menuInfo.innerHTML = '';
+          menuInfo.appendChild(inputName);
+          menuInfo.appendChild(inputPrice);
+          menuInfo.appendChild(textareaDesc);
+
+          button.textContent = 'Simpan';
+          button.classList.add('save-btn');
+          button.classList.remove('edit-btn');
+        } else {
+          // Simpan hasil edit
+          const inputName = menuInfo.querySelector('.edit-name');
+          const inputPrice = menuInfo.querySelector('.edit-price');
+          const textareaDesc = menuInfo.querySelector('.edit-desc');
+          const id = menuCard.dataset.id;
+
+          // Buat form dan submit otomatis
+          const form = document.createElement('form');
+          form.method = 'POST';
+          form.action = 'update_menu.php';
+
+           const inputNamaForm = document.createElement('input');
+           inputNamaForm.type = 'hidden';
+  inputNamaForm.name = 'nama_menu';
+  inputNamaForm.value = inputName.value;
+
+  const inputHargaForm = document.createElement('input');
+  inputHargaForm.type = 'hidden';
+  inputHargaForm.name = 'harga';
+  inputHargaForm.value = inputPrice.value;
+
+  const inputDescForm = document.createElement('input');
+  inputDescForm.type = 'hidden';
+  inputDescForm.name = 'deskripsi';
+  inputDescForm.value = textareaDesc.value;
+
+  const inputIdForm = document.createElement('input');
+  inputIdForm.type = 'hidden';
+  inputIdForm.name = 'id_menu';
+  inputIdForm.value = id;
+
+  form.appendChild(inputNamaForm);
+  form.appendChild(inputHargaForm);
+  form.appendChild(inputDescForm);
+  form.appendChild(inputIdForm);
+
+  document.body.appendChild(form);
+  form.submit();
+        }
+      });
+    });
+  </script>
+</body>
+</html>

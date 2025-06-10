@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login Pelanggan - SeraQ</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: linear-gradient(to bottom, #000d1a, #003366, #0055cc);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      padding: 30px 10px;
+    }
+
+    .container {
+      background-color: #111a4c;
+      width: 100%;
+      max-width: 420px;
+      border-radius: 16px;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+      padding: 30px 25px;
+      color: white;
+    }
+
+    .title {
+      font-size: 22px;
+      font-weight: bold;
+      margin-bottom: 25px;
+      text-align: center;
+    }
+
+    .input-box {
+      background-color: #00ccff;
+      border: none;
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-bottom: 16px;
+      width: 100%;
+      font-size: 16px;
+      color: white;
+      outline: none;
+    }
+
+    .input-box::placeholder {
+      color: white;
+      opacity: 0.9;
+    }
+
+    .input-box::-webkit-inner-spin-button,
+    .input-box::-webkit-outer-spin-button {
+      opacity: 1;
+    }
+
+    .login-btn {
+      background-color: #00ccff;
+      color: white;
+      font-weight: bold;
+      border: none;
+      border-radius: 10px;
+      padding: 14px 16px;
+      width: 100%;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 50px;
+      transition: background-color 0.3s ease;
+    }
+
+    .login-btn:hover {
+      background-color: #009acd;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="title">Halo, Pelanggan 👋</div>
+        <form action = "1_pelanggan.php" method = "POST">
+
+            <!-- Input Username -->
+            <input type="text" name="Nama" class="input-box" placeholder="Nama" />
+
+            <!-- Input Password -->
+            <input type="number" name="No_meja" class="input-box" placeholder="No_meja" min="1"/>
+
+            <!-- Tombol Login -->
+            <button type="submit" name="PESAN" class="login-btn">PESAN</button>
+     
+        </form>
+  </div>
+</body>
+</html>

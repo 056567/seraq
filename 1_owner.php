@@ -20,7 +20,7 @@ if (isset($_POST['LOGIN'])) {
         header("Location: 2_owner.php");
         exit(); // Penting supaya script berhenti
     } else {
-        $error = "Warung tidak ada!";
+        $error = "Username atau Password Salah.";
     }
 }
 ?>

@@ -1,5 +1,6 @@
 <?php
 include 'service/database_pelanggan.php';
+session_start();
 
 $id_owner = isset($_GET['id_owner']) ? intval($_GET['id_owner']) : 0;
 

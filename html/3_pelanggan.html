@@ -146,9 +146,69 @@
     .cart-button:hover {
       transform: scale(1.1);
     }
+    
+    .menu-container {
+      position: absolute;
+      top: 16px;
+      right: 20px;
+      z-index: 1000;
+    }
+
+    .menu-container details {
+      position: relative;
+    }
+
+    .menu-container summary {
+      list-style: none; 
+      font-size: 26px;
+      color: white;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .menu-container summary::-webkit-details-marker {
+      display: none; 
+    }
+
+    .menu-box {
+      position: absolute;
+      top: 40px;
+      right: 0;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      padding: 10px;
+      min-width: 160px;
+    }
+
+    .menu-box a {
+      display: block;
+      padding: 8px 12px;
+      text-decoration: none;
+      color: black;
+      font-size: 14px;
+    }
+
+    .menu-box a:hover {
+      background-color: #f0f0f0;
+    }
+
+    .menu-box a.logout {
+      color: red;
+    }
   </style>
 </head>
 <body>
+  <div class="menu-container">
+  <details>
+    <summary>≡</summary>
+    <div class="menu-box">
+      <a href="2_pelanggan.php">Dashboard</a>
+      <a href="5_pelanggan.php">Pesanan Saya</a>
+      <a href="logout.php" class="logout">Logout</a>
+    </div>
+  </details>
+  </div>
 
   <div class="header"><?php echo htmlspecialchars($data['nama_warung'] ?? 'Nama Warung'); ?></div>
 
@@ -201,7 +261,8 @@
     <?php endforeach; ?>
   <?php endif; ?>
 
-  <div class="cart-button">🛒</div>
+  <!-- Tombol Keranjang ke 5_pelanggan.php -->
+  <a href="5_pelanggan.php" class="cart-button">🛒</a>
 
 <script>
 document.querySelectorAll('.add-btn').forEach(function(button) {

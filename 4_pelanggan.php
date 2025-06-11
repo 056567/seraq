@@ -60,14 +60,15 @@ if (isset($_POST['tambah_ke_keranjang'])) { // Tombol submit memiliki name="tamb
             'id_owner' => $id_owner_post // Simpan id_owner ke item keranjang
         ];
 
+        $id_pelanggan = $_SESSION['id_pelanggan'];
         // Inisialisasi keranjang jika belum ada
-        if (!isset($_SESSION['cart'])) {
-            $_SESSION['cart'] = [];
+        if (!isset($_SESSION['cart'][$id_pelanggan])) {
+            $_SESSION['cart'][$id_pelanggan] = [];
         }
 
         // Cek apakah item sudah ada di keranjang (berdasarkan id_menu DAN catatan)
         $item_found = false;
-        foreach ($_SESSION['cart'] as &$cart_item) { // Gunakan referensi (&) untuk memodifikasi langsung
+        foreach ($_SESSION['cart']['$id_pelanggan'] as &$cart_item) { // Gunakan referensi (&) untuk memodifikasi langsung
             if ($cart_item['id_menu'] == $new_item['id_menu'] && $cart_item['catatan'] == $new_item['catatan']) {
                 $cart_item['qty'] += $new_item['qty']; // Tambahkan kuantitas
                 $item_found = true;
@@ -76,7 +77,7 @@ if (isset($_POST['tambah_ke_keranjang'])) { // Tombol submit memiliki name="tamb
         }
 
         if (!$item_found) {
-            $_SESSION['cart'][] = $new_item; // Tambahkan item baru
+            $_SESSION['cart'][$id_pelanggan][] = $new_item; // Tambahkan item baru
         }
 
         // Redirect ke halaman keranjang setelah menambahkan item

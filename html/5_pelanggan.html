@@ -61,16 +61,27 @@
       color: #d0d0d0;
     }
 
+    .item-qty-control {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      margin-top: 8px;
+    }
+
+    .item-qty-control form {
+      display: inline;
+    }
+
     .item-price {
       font-size: 14px;
       font-weight: bold;
       color: #00ccff;
+      white-space: nowrap;
     }
 
-    .item-qty {
+    .qty-text {
       font-size: 14px;
-      margin-top: 5px;
-      color: #ccc;
+      margin: 0 5px;
     }
 
     .total-section {
@@ -129,68 +140,97 @@
     .btn-bayar:hover {
       background-color: #009acd;
     }
+
+    .payment-option.selected {
+      background-color: #005f7f;
+      border: 2px solid #fff;
+    }
   </style>
 </head>
 <body>
 
-  <div class="cart-container">
-    <div class="header">Keranjang Kamu</div>
+<div class="cart-container">
+  <div class="header">Keranjang Kamu</div>
 
-    <?php if (empty($cart_items)): ?>
-        <p style="padding: 20px; text-align: center;">Keranjang kosong.</p>
-    <?php else: ?>
-        <?php foreach ($cart_items as $item): ?>
-            <div class="cart-item">
-                <div class="item-info">
-                    <div class="item-name"><?= htmlspecialchars($item['nama_menu']) ?></div>
-                    <?php if (!empty($item['catatan'])): ?>
-                        <div class="item-desc">Keterangan: <?= htmlspecialchars($item['catatan']) ?></div>
-                    <?php endif; ?>
-                    <div class="item-qty">x<?= htmlspecialchars($item['qty']) ?></div>
-                </div>
-                <div class="item-price">Rp<?= number_format($item['harga'] * $item['qty'], 0, ',', '.') ?></div>
-            </div>
-        <?php endforeach; ?>
-    <?php endif; ?>
+  <?php if (empty($cart_items)): ?>
+    <p style="padding: 20px; text-align: center;">Keranjang kosong.</p>
+  <?php else: ?>
+    <?php foreach ($_SESSION['cart'][$id_pelanggan] as $id_menu => $item): ?>
+      <div class="cart-item">
+        <div class="item-info">
+          <div class="item-name"><?= htmlspecialchars($item['nama_menu']) ?></div>
+          <div class="item-desc">Keterangan: <?= htmlspecialchars($item['keterangan'] ?? '-') ?></div>
+          <div class="item-qty-control">
+            <form action="update_cart.php" method="POST">
+              <input type="hidden" name="id_menu" value="<?= $id_menu ?>">
+              <button type="submit" name="action" value="minus">-</button>
+            </form>
 
-    <div class="total-section">Total: Rp<?= number_format($total_harga, 0, ',', '.') ?></div>
+            <span class="qty-text">x<?= $item['qty'] ?></span>
 
-    
-    <form action="process_order.php" method="POST">
-        <div class="payment-section">
-            <div class="payment-label">Pilih Metode Pembayaran:</div>
-            <div class="payment-options">
-                <button type="button" class="payment-option" data-method="Tunai">Tunai</button>
-                <button type="button" class="payment-option" data-method="QRIS">QRIS</button>
-                <button type="button" class="payment-option" data-method="Transfer">Transfer</button>
-                <input type="hidden" name="metode_pembayaran" id="metode_pembayaran" value=""> </div>
+            <form action="update_cart.php" method="POST">
+              <input type="hidden" name="id_menu" value="<?= $id_menu ?>">
+              <button type="submit" name="action" value="plus">+</button>
+            </form>
+          </div>
         </div>
+        <div class="item-price">
+          Rp<?= number_format($item['harga'] * $item['qty'], 0, ',', '.') ?>
+        </div>
+      </div>
+    <?php endforeach; ?>
+  <?php endif; ?>
 
-        <input type="hidden" name="total_harga" value="<?= htmlspecialchars($total_harga) ?>">
+  <div class="total-section">Total: Rp<?= number_format($total_harga, 0, ',', '.') ?></div>
 
-        <button type="submit" class="btn-bayar" name="konfirmasi_pesanan">Bayar Sekarang</button>
-    </form>
-  </div>
+  <form id="form_pembayaran" method="POST">
+    <div class="payment-section">
+      <div class="payment-label">Pilih Metode Pembayaran:</div>
+      <div class="payment-options">
+        <button type="button" class="payment-option" data-method="Tunai">Tunai</button>
+        <button type="button" class="payment-option" data-method="QRIS">QRIS</button>
+        <input type="hidden" name="metode_pembayaran" id="metode_pembayaran" value="">
+      </div>
+    </div>
+
+    <input type="hidden" name="total_harga" value="<?= htmlspecialchars($total_harga) ?>">
+    <input type="hidden" name="id_pelanggan" value="<?= $id_pelanggan ?>">
+    <input type="hidden" name="id_owner" value="<?= $id_owner ?>">
+    <input type="hidden" name="items" value='<?= json_encode($cart_items) ?>'>
+
+    <button type="submit" class="btn-bayar" name="konfirmasi_pesanan">Bayar Sekarang</button>
+  </form>
+</div>
 
 <script>
-    // JavaScript untuk memilih metode pembayaran
-    document.addEventListener('DOMContentLoaded', function() {
-        const paymentOptions = document.querySelectorAll('.payment-option');
-        const metodePembayaranInput = document.getElementById('metode_pembayaran');
+  document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('form_pembayaran');
+    const metodePembayaranInput = document.getElementById('metode_pembayaran');
+    const buttons = document.querySelectorAll('.payment-option');
 
-        paymentOptions.forEach(button => {
-            button.addEventListener('click', function() {
-                // Hapus kelas 'selected' dari semua tombol
-                paymentOptions.forEach(btn => btn.classList.remove('selected'));
-                // Tambahkan kelas 'selected' ke tombol yang diklik
-                this.classList.add('selected');
-                // Atur nilai input hidden
-                metodePembayaranInput.value = this.dataset.method;
-            });
-        });
+    buttons.forEach(btn => {
+      btn.addEventListener('click', function () {
+        buttons.forEach(b => b.classList.remove('selected'));
+        this.classList.add('selected');
+        const metode = this.dataset.method;
+        metodePembayaranInput.value = metode;
+
+        if (metode === 'Tunai') {
+          form.action = 'tunai.php';
+        } else if (metode === 'QRIS') {
+          form.action = 'qris.php';
+        }
+      });
     });
+
+    form.addEventListener('submit', function (e) {
+      if (!metodePembayaranInput.value) {
+        alert("Pilih metode pembayaran terlebih dahulu!");
+        e.preventDefault();
+      }
+    });
+  });
 </script>
+
 </body>
 </html>
-
-

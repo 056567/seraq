@@ -7,7 +7,10 @@ if (!isset($_SESSION['Nama_pelanggan'])){
 }
 
 include "service/database_pelanggan.php";
-$nama_warung = $_SESSION['nama_warung'];
+$nama_warung = isset($_SESSION['nama_warung']) ? $_SESSION['nama_warung'] : '';
+
+$cart_items = $_SESSION['cart'][$_SESSION['id_pelanggan']] ?? [];
+$ada_pesanan_belum_bayar = !empty($cart_items);
 
 $sql = "SELECT * FROM owner";
 // Query dengan rating asli

@@ -215,119 +215,67 @@
   </div>
 
   <script>
-    const pesananData = {
-      '3001': {
-        waktu: '01 Jun 2025, 19:10',
-        menu: `• Nasi Goreng x1 - Rp18.000<br>• Es Teh x2 - Rp6.000`,
-        total: 'Rp30.000',
-        keterangan: 'Tolong jangan terlalu pedas ya kak, makasih!',
-        status: 'menunggu'
-      },
-      '3002': {
-        waktu: '01 Jun 2025, 19:15',
-        menu: `• Mie Ayam x2 - Rp24.000<br>• Teh Manis Hangat x1 - Rp4.000`,
-        total: 'Rp28.000',
-        keterangan: 'Tanpa sambal ya.',
-        status: 'menunggu'
-      },
-      '3003': {
-        waktu: '01 Jun 2025, 19:20',
-        menu: `• Sate Ayam x1 - Rp25.000<br>• Air Mineral x1 - Rp5.000`,
-        total: 'Rp30.000',
-        keterangan: 'Bungkus terpisah ya.',
-        status: 'menunggu'
-      }
-    };
+  function renderPesanan() {
+    const listMenunggu = document.getElementById('list-menunggu');
+    const listProses = document.getElementById('list-proses');
+    const listDitolak = document.getElementById('list-ditolak');
 
-    let pesananDipilih = "";
+    // Clear existing
+    listMenunggu.innerHTML = '';
+    listProses.innerHTML = '';
+    listDitolak.innerHTML = '';
 
-    function renderPesanan() {
-      document.getElementById("list-menunggu").innerHTML = "";
-      document.getElementById("list-proses").innerHTML = "";
-      document.getElementById("list-ditolak").innerHTML = "";
+    for (const [id, data] of Object.entries(pesananData)) {
+      const card = document.createElement('div');
+      card.className = 'order-card';
 
-      for (let id in pesananData) {
-        const data = pesananData[id];
-        const card = document.createElement("div");
-        card.className = "order-card";
-        card.id = "pesanan-" + id;
-        card.innerHTML = `
-          <div class="order-header">
-            <div>ID: ORD-${id}</div>
-            <div>${data.waktu}</div>
-          </div>
-          <div class="menu-list">${data.menu.replace(/ - Rp[\d.]+/g, '')}</div>
-          <div class="status ${data.status}" id="status-${id}">${statusText(data.status)}</div>
-          <div class="action-group" id="actions-${id}">
-            ${data.status === "menunggu" ? `<button class="aksi-btn" onclick="lihatDetail('${id}')">Lihat Detail</button>` :
-              data.status === "proses" ? `<button class="aksi-btn" onclick="selesaikanPesanan('${id}')">Tandai Selesai</button>` : ``}
-          </div>
-        `;
+      card.innerHTML = `
+        <div class="order-header">
+          <div>ID: ${id}</div>
+          <div>${data.waktu}</div>
+        </div>
+        <div class="menu-list">${data.menu}</div>
+        <div class="total">${data.total}</div>
+        <div class="keterangan">${data.keterangan || '-'}</div>
+        <div class="status ${data.status}">${statusText(data.status)}</div>
+        <div class="action-group">
+          <button class="aksi-btn" onclick="lihatDetail('${id}')">Lihat Detail</button>
+        </div>
+      `;
 
-        const containerId = `list-${data.status}`;
-        document.getElementById(containerId).appendChild(card);
-      }
+      if (data.status === 'menunggu') listMenunggu.appendChild(card);
+      else if (data.status === 'proses') listProses.appendChild(card);
+      else if (data.status === 'ditolak') listDitolak.appendChild(card);
+    }
+  }
+
+  function lihatDetail(id) {
+    const data = pesananData[id];
+    document.getElementById('detail-id').textContent = 'ID: ' + id;
+    document.getElementById('detail-waktu').textContent = data.waktu;
+    document.getElementById('detail-menu').innerHTML = data.menu;
+    document.getElementById('detail-total').textContent = data.total;
+    document.getElementById('detail-keterangan').textContent = data.keterangan || '-';
+    document.getElementById('detail-status').textContent = statusText(data.status);
+    document.getElementById('detail-status').className = 'status ' + data.status;
+
+    // Action buttons (optional)
+    const actionGroup = document.getElementById('detail-actions');
+    actionGroup.innerHTML = '';
+
+    if (data.status === 'menunggu') {
+      actionGroup.innerHTML = `
+        <button class="aksi-btn btn-green">Terima</button>
+        <button class="aksi-btn btn-red">Tolak</button>
+      `;
     }
 
-    function statusText(kode) {
-      return {
-        menunggu: "Menunggu Konfirmasi",
-        proses: "Dalam Proses",
-        selesai: "Selesai",
-        ditolak: "Pesanan Ditolak"
-      }[kode];
-    }
+    document.getElementById('overlay-detail').style.display = 'flex';
+  }
 
-    function lihatDetail(id) {
-      pesananDipilih = id;
-      const data = pesananData[id];
-
-      document.getElementById("detail-id").innerText = "ID: ORD-" + id;
-      document.getElementById("detail-waktu").innerText = data.waktu;
-      document.getElementById("detail-menu").innerHTML = data.menu;
-      document.getElementById("detail-total").innerText = "Total: " + data.total;
-      document.getElementById("detail-keterangan").innerHTML = "📝 Keterangan: " + data.keterangan;
-      document.getElementById("detail-status").className = "status " + data.status;
-      document.getElementById("detail-status").innerText = statusText(data.status);
-
-      if (data.status === "menunggu") {
-        document.getElementById("detail-actions").innerHTML = `
-          <button class="aksi-btn btn-green" onclick="terimaPesanan('${id}')">Terima</button>
-          <button class="aksi-btn btn-red" onclick="tolakPesanan('${id}')">Tolak</button>
-        `;
-      } else if (data.status === "proses") {
-        document.getElementById("detail-actions").innerHTML = `
-          <button class="aksi-btn" onclick="selesaikanPesanan('${id}')">Tandai Selesai</button>
-        `;
-      } else {
-        document.getElementById("detail-actions").innerHTML = ``;
-      }
-
-      document.getElementById("overlay-detail").style.display = "flex";
-    }
-
-    function tutupDetail() {
-      document.getElementById("overlay-detail").style.display = "none";
-    }
-
-    function terimaPesanan(id) {
-      pesananData[id].status = "proses";
-      renderPesanan();
-      tutupDetail();
-    }
-
-    function tolakPesanan(id) {
-      pesananData[id].status = "ditolak";
-      renderPesanan();
-      tutupDetail();
-    }
-
-    function selesaikanPesanan(id) {
-      pesananData[id].status = "selesai";
-      renderPesanan();
-    }
-
-    renderPesanan();
-  </script>
+  function tutupDetail() {
+    document.getElementById('overlay-detail').style.display = 'none';
+  }
+</script>
 </body>
 </html>

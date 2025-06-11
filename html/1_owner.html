@@ -72,16 +72,35 @@
     .login-btn:hover {
       background-color: #0077aa;
     }
+
+    .error-message {
+      margin-top: 30px;
+      color: #ff9999;
+      font-weight: bold;
+    }
+
+    /* Tambahan untuk ikon toggle password */
+    .password-wrapper {
+      position: relative;
+    }
+
+    .toggle-password {
+      position: absolute;
+      top: 40%;
+      right: 14px;
+      transform: translateY(-50%);
+      cursor: pointer;
+    }
+
+    .toggle-password svg {
+      fill: white;
+    }
   </style>
 </head>
 <body>
+  <?php include "html/header.html"?>
   <div class="container">
     <div class="title">Halo, Owner</div>
-
-    <!-- Pesan Error -->
-     <?php if (!empty($error)) : ?>
-        <p style = "color: #ffcccb; font-weight: bold;"><?php echo $error; ?></p>
-     <?php endif; ?>
 
     <!-- FORM dimulai disini -->
     <form action = "1_owner.php" method = "POST">
@@ -89,12 +108,52 @@
         <!-- Input Username -->
         <input type="text" name = "username" class="input-box" placeholder="Username" />
 
-        <!-- Input Password -->
-        <input type="password" name = "password" class="input-box" placeholder="Password" />
+        <!-- Input Password + Ikon Mata -->
+      <div class="password-wrapper">
+        <input type="password" name="password" class="input-box" placeholder="Password" id="password" />
+        <span class="toggle-password" onclick="togglePassword()">
+          <!-- Mata terbuka (default) -->
+          <svg id="eye-open" xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 0 24 24">
+            <path d="M12 4.5C7 4.5 2.73 8.11 1 12c1.73 3.89 6 7.5 11 7.5s9.27-3.61 11-7.5c-1.73-3.89-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 
+            5-5 5 2.24 5 5-2.24 5-5 5z"/>
+            <circle cx="12" cy="12" r="2.5"/>
+          </svg>
+
+          <!-- Mata tertutup (disembunyikan) -->
+          <svg id="eye-closed" xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 0 24 24" style="display: none;">
+            <path d="M12 6c3.31 0 6.31 1.68 8.11 4.22.2.29.2.68 0 .98C18.31 13.32 15.31 15 12 15s-6.31-1.68-8.11-4.22a.75.75 0 0 1 0-.98C5.69 
+            7.68 8.69 6 12 6m0-2c-4.42 0-8.41 2.4-10.6 6.4a2.75 2.75 0 0 0 0 3.2C3.59 17.6 7.58 20 12 20s8.41-2.4 10.6-6.4a2.75 2.75 0 0 0 
+            0-3.2C20.41 6.4 16.42 4 12 4z"/>
+          </svg>
+        </span>
+      </div>
 
         <!-- Tombol Login -->
-        <button type = "submit" name = "LOGIN" class="login-btn">LOGIN</button>
+      <button type="submit" name="LOGIN" class="login-btn">LOGIN</button>
+      <?php if (!empty($error)) : ?>
+        <div class="error-message"><?= $error ?></div>
+      <?php endif; ?>
+      <?php include "html/footer.html"?>
     </form> 
   </div>
+
+  <!-- Script untuk toggle password -->
+  <script>
+    function togglePassword() {
+      const passwordInput = document.getElementById("password");
+      const eyeOpen = document.getElementById("eye-open");
+      const eyeClosed = document.getElementById("eye-closed");
+
+      if (passwordInput.type === "password") {
+        passwordInput.type = "text";
+        eyeOpen.style.display = "none";
+        eyeClosed.style.display = "inline";
+      } else {
+        passwordInput.type = "password";
+        eyeOpen.style.display = "inline";
+        eyeClosed.style.display = "none";
+      }
+    }
+  </script>
 </body>
 </html>

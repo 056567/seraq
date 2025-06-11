@@ -9,7 +9,7 @@ $error = "";
 if (isset($_POST['LOGIN'])) {
     $username = mysqli_real_escape_string($db, $_POST["username"]);
     $password = mysqli_real_escape_string($db, $_POST["password"]);
-
+ 
     $query = "SELECT * FROM owner WHERE username='$username' AND password='$password'";
     $result = mysqli_query($db, $query);
 

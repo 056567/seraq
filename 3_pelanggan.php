@@ -3,6 +3,7 @@ include 'service/database_pelanggan.php';
 session_start();
 
 $id_owner = isset($_GET['id_owner']) ? intval($_GET['id_owner']) : 0;
+$_SESSION['id_owner'] = $id_owner;
 
 if ($id_owner > 0) {
     $query = "SELECT * FROM owner WHERE id_owner = ?";

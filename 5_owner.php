@@ -11,7 +11,7 @@ if (!isset($_SESSION['id_owner'])) {
 $nama_warung = $_SESSION['nama_warung'] ?? 'Owner';
 $id_owner = $_SESSION['id_owner'];
 
-// Query diperbaiki: tidak ada detail_pesanan, langsung dari tabel pesanan + JOIN menu
+// Query pesanan + menu + pelanggan
 $query = "SELECT 
             p.id_pesanan, 
             p.status AS status_pesanan,
@@ -20,9 +20,12 @@ $query = "SELECT
             p.jumlah,
             p.total_harga,
             m.nama_menu,
-            m.harga
+            m.harga,
+            pel.nama AS nama_pelanggan,
+            pel.no_meja
           FROM pesanan p
           JOIN menu m ON p.id_menu = m.id_menu
+          JOIN pelanggan pel ON p.id_pelanggan = pel.id_pelanggan
           WHERE m.id_owner = '$id_owner'
           ORDER BY p.waktu_pesan DESC";
 
@@ -33,24 +36,32 @@ $pesanan_data = [];
 while ($row = mysqli_fetch_assoc($result)) {
     $id = $row['id_pesanan'];
 
-    // Gabung menu jika pesanan dengan ID sama ada lebih dari satu (optional)
     if (!isset($pesanan_data[$id])) {
         $pesanan_data[$id] = [
             'waktu' => date('d M Y, H:i', strtotime($row['waktu_pesanan'])),
             'menu' => '',
-            'total' => 'Rp' . number_format($row['total_harga'], 0, ',', '.'),
+            'total' => 0,
             'keterangan' => $row['keterangan'],
-            'status' => $row['status_pesanan']
+            'status' => $row['status_pesanan'],
+            'nama_pelanggan' => $row['nama_pelanggan'],
+            'no_meja' => $row['no_meja']
         ];
     }
 
     $baris_menu = $row['nama_menu'] . ' x' . $row['jumlah'] . ' - Rp' . number_format($row['harga'] * $row['jumlah'], 0, ',', '.');
     $pesanan_data[$id]['menu'] .= $baris_menu . '<br>';
+    $pesanan_data[$id]['total'] += $row['harga'] * $row['jumlah'];
 }
+
+// Format total harga setelah pengelompokan
+foreach ($pesanan_data as &$pesanan) {
+    $pesanan['total'] = 'Rp' . number_format($pesanan['total'], 0, ',', '.');
+}
+unset($pesanan);
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -60,8 +71,8 @@ while ($row = mysqli_fetch_assoc($result)) {
   <?php include "html/5_owner.html"; ?> 
 
   <script>
+    // Data pesanan diisi dari PHP
     const pesananData = <?= json_encode($pesanan_data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE); ?>;
-    // Tambahkan ini agar fungsi renderPesanan bisa jalan setelah data masuk
     document.addEventListener("DOMContentLoaded", () => {
         if (typeof renderPesanan === 'function') {
             renderPesanan();

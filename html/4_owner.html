@@ -83,48 +83,21 @@
 </head>
 <body>
 
-  <h2>Riwayat Transaksi</h2>
-
-  <div class="transaction-card">
-    <div class="transaction-header">
-      <div>ID: TRX-1001</div>
-      <div>01 Jun 2025, 14:20</div>
-    </div>
-    <div class="menu-list">
-      • Nasi Goreng x1<br>
-      • Teh Manis x2
-    </div>
-    <div class="payment-method">Metode Pembayaran: Tunai</div>
-    <div class="total">Total: Rp 25.000</div>
-    <div class="status selesai">Selesai</div>
-  </div>
-
-  <div class="transaction-card">
-    <div class="transaction-header">
-      <div>ID: TRX-1002</div>
-      <div>01 Jun 2025, 15:05</div>
-    </div>
-    <div class="menu-list">
-      • Mie Ayam x2<br>
-      • Es Jeruk x1
-    </div>
-    <div class="payment-method">Metode Pembayaran: Transfer</div>
-    <div class="total">Total: Rp 29.000</div>
-    <div class="status proses">Dalam Proses</div>
-  </div>
-
-  <div class="transaction-card">
-    <div class="transaction-header">
-      <div>ID: TRX-1003</div>
-      <div>01 Jun 2025, 16:10</div>
-    </div>
-    <div class="menu-list">
-      • Bakso Super x1
-    </div>
-    <div class="payment-method">Metode Pembayaran: QRIS</div>
-    <div class="total">Total: Rp 15.000</div>
-    <div class="status selesai">Selesai</div>
-  </div>
+  <h2>Transaksi Selesai</h2>
+<table border="1" width="100%">
+  <thead>
+    <tr>
+      <th>No</th>
+      <th>Nama Pelanggan</th>
+      <th>No Meja</th>
+      <th>Waktu</th>
+      <th>Total</th>
+    </tr>
+  </thead>
+  <tbody id="tabel-transaksi">
+    <!-- Data akan diisi otomatis oleh JS -->
+  </tbody>
+</table>
 
 </body>
 </html>

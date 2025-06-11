@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pesanan Saya</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(to bottom, #000d1a, #003366, #0047ab);
+            color: white;
+            min-height: 100vh;
+        }
+
+        .header {
+            background-color: #00CFFF;
+            padding: 20px 16px;
+            border-radius: 0 0 20px 20px;
+        }
+
+        .header h2 {
+            margin: 0;
+            font-size: 24px;
+            color: black;
+        }
+
+        .container {
+            padding: 16px;
+        }
+
+        .pesanan-card {
+            background-color: #162B40;
+            color: white;
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .pesanan-info {
+            flex-grow: 1;
+        }
+
+        .pesanan-card h3 {
+            margin-bottom: 4px;
+            color: #00CFFF;
+        }
+
+        .pesanan-card p {
+            margin-bottom: 4px;
+            font-size: 14px;
+        }
+
+        .pesanan-card .status {
+            font-weight: bold;
+        }
+
+        .pesanan-card .detail-btn {
+            background-color: #00CFFF;
+            color: black;
+            padding: 8px 12px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        .pesanan-card .detail-btn:hover {
+            background-color: #0099CC;
+        }
+
+        .no-pesanan {
+            color: white;
+            text-align: center;
+            margin-top: 40px;
+            font-size: 18px;
+        }
+        .menu-container {
+        position: absolute;
+        top: 16px;
+        right: 20px;
+        z-index: 1000;
+        }
+
+        .menu-container details {
+        position: relative;
+        }
+
+        .menu-container summary {
+        list-style: none; /* HILANGKAN SEGITIGA */
+        font-size: 26px;
+        color: white;
+        cursor: pointer;
+        user-select: none;
+        }
+
+        .menu-container summary::-webkit-details-marker {
+        display: none; /* Juga hilangkan di Chrome */
+        }
+
+        .menu-box {
+        position: absolute;
+        top: 40px;
+        right: 0;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        padding: 10px;
+        min-width: 160px;
+        }
+
+        .menu-box a {
+        display: block;
+        padding: 8px 12px;
+        text-decoration: none;
+        color: black;
+        font-size: 14px;
+        }
+
+        .menu-box a:hover {
+        background-color: #f0f0f0;
+        }
+
+        .menu-box a.logout {
+        color: red;
+        }
+    </style>
+</head>
+<body>
+    <div class="menu-container">
+        <details>
+            <summary>≡</summary>
+            <div class="menu-box">
+                <a href="2_pelanggan.php">Dashboard</a>
+                <a href="pesanan_pelanggan.php">Pesanan Saya</a>
+                <a href="logout.php" class="logout">Logout</a>
+            </div>
+        </details>
+    </div>
+
+    <div class="header">
+        <h2>Pesanan Saya</h2>
+    </div>
+
+    <div class="container">
+        <?php if (empty($pesanan)): ?>
+            <p class="no-pesanan">Anda belum memiliki pesanan</p>
+        <?php else: ?>
+            <?php foreach ($pesanan as $index => $item): ?>
+                <div class="pesanan-card">
+                    <div class="pesanan-info">
+                        <h3>Pesanan #<?= $index + 1 ?></h3>
+                        <p class="status">Status: <?= htmlspecialchars($item['status']) ?></p>
+                    </div>
+                    <a href="6_pelanggan.php?id_pesanan=<?= $item['id_pesanan'] ?>" class="detail-btn">
+                        Detail
+                    </a>
+                </div>
+            <?php endforeach; ?>
+        <?php endif; ?>
+    </div>
+</body>
+</html>

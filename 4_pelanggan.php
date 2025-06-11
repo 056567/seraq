@@ -10,10 +10,18 @@ if (!isset($_SESSION['id_pelanggan'])) {
     exit();
 }
 
-$id_menu = isset($_GET['id_menu']) ? intval($_GET['id_menu']) : 0;
-$id_owner = isset($_GET['id_owner']) ? intval($_GET['id_owner']) : 0; // Pastikan id_owner juga diambil jika diperlukan
+if (!isset($_SESSION['nama_pelanggan']) || !isset($_SESSION['no_meja'])) {
+    // Session belum lengkap, mungkin user belum login
+    header("Location: 1_pelanggan.php");
+    exit();
+}
 
-$menu_data = null; // Inisialisasi variabel untuk menyimpan data menu
+// Ambil data dari session
+$nama_pelanggan = $_SESSION['nama_pelanggan'];
+$no_meja = $_SESSION['no_meja'];
+$id_owner = $_SESSION['id_owner']; // ID owner dari session
+
+$id_menu = isset($_GET['id_menu']) ? intval($_GET['id_menu']) : 0;
 
 if ($id_menu > 0) {
     $query = "SELECT * FROM menu WHERE id_menu = ?";
@@ -68,7 +76,7 @@ if (isset($_POST['tambah_ke_keranjang'])) { // Tombol submit memiliki name="tamb
 
         // Cek apakah item sudah ada di keranjang (berdasarkan id_menu DAN catatan)
         $item_found = false;
-        foreach ($_SESSION['cart']['$id_pelanggan'] as &$cart_item) { // Gunakan referensi (&) untuk memodifikasi langsung
+        foreach ($_SESSION['cart'][$id_pelanggan] as &$cart_item) { // Gunakan referensi (&) untuk memodifikasi langsung
             if ($cart_item['id_menu'] == $new_item['id_menu'] && $cart_item['catatan'] == $new_item['catatan']) {
                 $cart_item['qty'] += $new_item['qty']; // Tambahkan kuantitas
                 $item_found = true;
@@ -81,7 +89,7 @@ if (isset($_POST['tambah_ke_keranjang'])) { // Tombol submit memiliki name="tamb
         }
 
         // Redirect ke halaman keranjang setelah menambahkan item
-        header("Location: 5_pelanggan.php");
+        header("Location: 3_pelanggan.php?id_owner=" . $id_owner_post);
         exit(); // Penting: hentikan eksekusi script setelah redirect
     } else {
         die("Detail menu tidak ditemukan saat menambahkan ke keranjang.");

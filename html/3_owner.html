@@ -124,7 +124,7 @@
   <h2>Kelola Menu Warung</h2>
    <?php if ($result && mysqli_num_rows($result) > 0): ?>
     <?php while ($row = mysqli_fetch_assoc($result)): 
-      $id = $row['id'] ?? '';
+      $id = $row['id_menu'] ?? '';
       $nama = $row['nama_menu'] ?? 'Nama Menu';
       $harga = $row['harga'] ?? 0;
       $deskripsi = $row['deskripsi'] ?? 'Deskripsi menu';
@@ -139,9 +139,9 @@
           <div class="desc"><?= htmlspecialchars($deskripsi) ?></div>
         </div>
         <div class="button-group">
-          <button class="status-btn <?= $status === 'Habis' ? 'sold-out' : '' ?>">
-            <?= $status ?>
-          </button>
+      <button class="status-btn <?= $status === 'Habis' ? 'sold-out' : '' ?>" data-id="<?= $id ?>" data-status="<?= $status ?>">
+         <?= $status ?>
+      </button>
           <button class="edit-btn">Edit</button>
         </div>
       </div>
@@ -151,82 +151,102 @@
   <?php endif; ?>
 
 
-  <script>
-    document.querySelectorAll('.edit-btn').forEach(button => {
-      button.addEventListener('click', () => {
+<script>
+// For Edit/Save button
+document.querySelectorAll('.edit-btn, .save-btn').forEach(button => {
+    button.addEventListener('click', function(e) {
+        e.preventDefault();
         const menuCard = button.closest('.menu-card');
         const menuInfo = menuCard.querySelector('.menu-info');
-        const h4 = menuInfo.querySelector('h4');
-        const p = menuInfo.querySelector('p');
-        const descDiv = menuInfo.querySelector('.desc');
 
         if (button.textContent === 'Edit') {
-          // Ganti teks dengan input / textarea
-          const inputName = document.createElement('input');
-          inputName.type = 'text';
-          inputName.value = h4.textContent;
-          inputName.className = 'edit-name';
+            // Mode edit
+            const h4 = menuInfo.querySelector('h4');
+            const p = menuInfo.querySelector('p');
+            const descDiv = menuInfo.querySelector('.desc');
 
-          const inputPrice = document.createElement('input');
-          inputPrice.type = 'text';
-          inputPrice.value = p.textContent;
-          inputPrice.className = 'edit-price';
+            const inputName = document.createElement('input');
+            inputName.type = 'text';
+            inputName.className = 'edit-name';
+            inputName.value = h4.textContent;
 
-          const textareaDesc = document.createElement('textarea');
-          textareaDesc.className = 'edit-desc';
-          textareaDesc.rows = 3;
-          textareaDesc.value = descDiv ? descDiv.textContent : '';
+            const inputPrice = document.createElement('input');
+            inputPrice.type = 'text';
+            inputPrice.className = 'edit-price';
+            inputPrice.value = p.textContent.replace(/[^0-9]/g, '');
 
-          menuInfo.innerHTML = '';
-          menuInfo.appendChild(inputName);
-          menuInfo.appendChild(inputPrice);
-          menuInfo.appendChild(textareaDesc);
+            const textareaDesc = document.createElement('textarea');
+            textareaDesc.className = 'edit-desc';
+            textareaDesc.rows = 3;
+            textareaDesc.value = descDiv.textContent;
 
-          button.textContent = 'Simpan';
-          button.classList.add('save-btn');
-          button.classList.remove('edit-btn');
+            menuInfo.innerHTML = '';
+            menuInfo.appendChild(inputName);
+            menuInfo.appendChild(inputPrice);
+            menuInfo.appendChild(textareaDesc);
+
+            button.textContent = 'Simpan';
+            button.classList.replace('edit-btn', 'save-btn');
         } else {
-          // Simpan hasil edit
-          const inputName = menuInfo.querySelector('.edit-name');
-          const inputPrice = menuInfo.querySelector('.edit-price');
-          const textareaDesc = menuInfo.querySelector('.edit-desc');
-          const id = menuCard.dataset.id;
+            // Simpan via AJAX
+            const inputName = menuInfo.querySelector('.edit-name');
+            const inputPrice = menuInfo.querySelector('.edit-price');
+            const textareaDesc = menuInfo.querySelector('.edit-desc');
+            const id = menuCard.dataset.id;
 
-          // Buat form dan submit otomatis
-          const form = document.createElement('form');
-          form.method = 'POST';
-          form.action = 'update_menu.php';
+            const params = new URLSearchParams({
+                id_menu: id,
+                nama_menu: inputName.value,
+                harga: inputPrice.value,
+                deskripsi: textareaDesc.value
+            });
 
-           const inputNamaForm = document.createElement('input');
-           inputNamaForm.type = 'hidden';
-  inputNamaForm.name = 'nama_menu';
-  inputNamaForm.value = inputName.value;
-
-  const inputHargaForm = document.createElement('input');
-  inputHargaForm.type = 'hidden';
-  inputHargaForm.name = 'harga';
-  inputHargaForm.value = inputPrice.value;
-
-  const inputDescForm = document.createElement('input');
-  inputDescForm.type = 'hidden';
-  inputDescForm.name = 'deskripsi';
-  inputDescForm.value = textareaDesc.value;
-
-  const inputIdForm = document.createElement('input');
-  inputIdForm.type = 'hidden';
-  inputIdForm.name = 'id_menu';
-  inputIdForm.value = id;
-
-  form.appendChild(inputNamaForm);
-  form.appendChild(inputHargaForm);
-  form.appendChild(inputDescForm);
-  form.appendChild(inputIdForm);
-
-  document.body.appendChild(form);
-  form.submit();
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', 'update_menu.php', true);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xhr.onload = function() {
+                if (xhr.status === 200 && xhr.responseText.trim() === "OK") {
+                    // Update tampilan ke mode view
+                    menuInfo.innerHTML = `
+                        <h4>${inputName.value}</h4>
+                        <p>Rp ${parseInt(inputPrice.value).toLocaleString('id-ID')}</p>
+                        <div class="desc">${textareaDesc.value}</div>
+                    `;
+                    button.textContent = 'Edit';
+                    button.classList.replace('save-btn', 'edit-btn');
+                } else {
+                    alert('Gagal menyimpan perubahan!');
+                }
+            };
+            xhr.send(params.toString());
         }
-      });
     });
-  </script>
+});
+// For Status button
+document.querySelectorAll('.status-btn').forEach(button => {
+    button.addEventListener('click', function(e) {
+        e.preventDefault();
+        const id = this.getAttribute('data-id');
+        const currentStatus = this.getAttribute('data-status');
+        const newStatus = currentStatus === 'Tersedia' ? 'Habis' : 'Tersedia';
+
+        // Update tampilan tombol secara langsung
+        this.setAttribute('data-status', newStatus);
+        this.textContent = newStatus;
+        if (newStatus === 'Habis') {
+            this.classList.add('sold-out');
+        } else {
+            this.classList.remove('sold-out');
+        }
+
+        // Kirim perubahan ke server via AJAX (tanpa reload)
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', 'update_status_menu.php', true);
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        xhr.send('id_menu=' + encodeURIComponent(id) + '&status=' + encodeURIComponent(newStatus));
+        // Tidak perlu reload halaman, tombol bisa bolak-balik
+    });
+});
+</script>
 </body>
 </html>

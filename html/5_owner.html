@@ -192,6 +192,12 @@
     <div id="list-proses"></div>
   </div>
 
+  <!-- Kategori: Selesai -->
+  <div class="kategori-pesanan">
+    <h3>✅ Selesai</h3>
+    <div id="list-selesai"></div>
+  </div>
+
   <!-- Kategori: Ditolak -->
   <div class="kategori-pesanan">
     <h3>❌ Ditolak</h3>
@@ -216,48 +222,66 @@
 
   <script>
   function renderPesanan() {
-    const listMenunggu = document.getElementById('list-menunggu');
-    const listProses = document.getElementById('list-proses');
-    const listDitolak = document.getElementById('list-ditolak');
+  const listMenunggu = document.getElementById('list-menunggu');
+  const listProses = document.getElementById('list-proses');
+  const listDitolak = document.getElementById('list-ditolak');
+  const listSelesai = document.getElementById('list-selesai'); // Tambahan
 
-    // Clear existing
-    listMenunggu.innerHTML = '';
-    listProses.innerHTML = '';
-    listDitolak.innerHTML = '';
+  // Clear existing
+  listMenunggu.innerHTML = '';
+  listProses.innerHTML = '';
+  listDitolak.innerHTML = '';
+  if (listSelesai) listSelesai.innerHTML = '';
 
-    for (const [id, data] of Object.entries(pesananData)) {
-      const card = document.createElement('div');
-      card.className = 'order-card';
+  for (const [id, data] of Object.entries(pesananData)) {
+    const card = document.createElement('div');
+    card.className = 'order-card';
 
-      card.innerHTML = `
-        <div class="order-header">
-          <div>ID: ${id}</div>
-          <div>${data.waktu}</div>
-        </div>
-        <div class="menu-list">${data.menu}</div>
-        <div class="total">${data.total}</div>
-        <div class="keterangan">${data.keterangan || '-'}</div>
-        <div class="status ${data.status}">${statusText(data.status)}</div>
-        <div class="action-group">
-          <button class="aksi-btn" onclick="lihatDetail('${id}')">Lihat Detail</button>
-        </div>
-      `;
+    card.innerHTML = `
+      <div class="order-header">
+        <div>ID: ${id}</div>
+        <div>${data.waktu}</div>
+      </div>
+      <div style="font-size:13px; margin-bottom:6px;">
+        <b>${data.nama_pelanggan}</b> &bull; Meja: <b>${data.no_meja}</b>
+      </div>
+      <div class="menu-list">${data.menu}</div>
+      <div class="total">${data.total}</div>
+      <div class="keterangan">${data.keterangan || '-'}</div>
+      <div class="status ${data.status}">${statusText(data.status)}</div>
+      <div class="action-group">
+        <button class="aksi-btn" onclick="lihatDetail('${id}')">Lihat Detail</button>
+      </div>
+    `;
 
-      if (data.status === 'menunggu') listMenunggu.appendChild(card);
-      else if (data.status === 'proses') listProses.appendChild(card);
-      else if (data.status === 'ditolak') listDitolak.appendChild(card);
-    }
+    if (data.status === 'menunggu') listMenunggu.appendChild(card);
+    else if (data.status === 'proses') listProses.appendChild(card);
+    else if (data.status === 'ditolak') listDitolak.appendChild(card);
+    else if (data.status === 'selesai' && listSelesai) listSelesai.appendChild(card);
   }
+}
 
-  function lihatDetail(id) {
-    const data = pesananData[id];
-    document.getElementById('detail-id').textContent = 'ID: ' + id;
-    document.getElementById('detail-waktu').textContent = data.waktu;
-    document.getElementById('detail-menu').innerHTML = data.menu;
-    document.getElementById('detail-total').textContent = data.total;
-    document.getElementById('detail-keterangan').textContent = data.keterangan || '-';
-    document.getElementById('detail-status').textContent = statusText(data.status);
-    document.getElementById('detail-status').className = 'status ' + data.status;
+ function lihatDetail(id) {
+  const data = pesananData[id];
+  document.getElementById('detail-id').textContent = 'ID: ' + id;
+  document.getElementById('detail-waktu').textContent = data.waktu;
+  document.getElementById('detail-menu').innerHTML = data.menu;
+  document.getElementById('detail-total').textContent = data.total;
+  document.getElementById('detail-keterangan').textContent = data.keterangan || '-';
+  document.getElementById('detail-status').textContent = statusText(data.status);
+  document.getElementById('detail-status').className = 'status ' + data.status;
+
+
+    // Tambahkan info pelanggan & meja
+  let info = document.getElementById('detail-info');
+  if (!info) {
+    info = document.createElement('div');
+    info.id = 'detail-info';
+    info.style = "margin-bottom:8px;font-size:13px;";
+    document.querySelector('.detail-box').insertBefore(info, document.getElementById('detail-menu'));
+  }
+  info.innerHTML = `<b>${data.nama_pelanggan}</b> &bull; Meja: <b>${data.no_meja}</b>`;
+
 
     // Action buttons (optional)
     const actionGroup = document.getElementById('detail-actions');
@@ -265,10 +289,29 @@
 
     if (data.status === 'menunggu') {
       actionGroup.innerHTML = `
-        <button class="aksi-btn btn-green">Terima</button>
-        <button class="aksi-btn btn-red">Tolak</button>
-      `;
-    }
+      <button class="aksi-btn btn-green" id="btn-terima">Terima</button>
+      <button class="aksi-btn btn-red" id="btn-tolak">Tolak</button>
+  ` ;
+    document.getElementById('btn-terima').onclick = function() {
+    updateStatusPesanan(id, 'proses');
+    };
+    document.getElementById('btn-tolak').onclick = function() {
+    updateStatusPesanan(id, 'ditolak');
+    };
+  } else if (data.status === 'proses') {
+    // Tampilkan konfirmasi "Tandai selesai?"
+    actionGroup.innerHTML = `
+      <div style="margin-bottom:10px;">Tandai selesai?</div>
+      <button class="aksi-btn btn-green" id="btn-yes">Iya</button>
+      <button class="aksi-btn btn-red" id="btn-no">Tidak</button>
+    `;
+    document.getElementById('btn-yes').onclick = function() {
+      updateStatusPesanan(id, 'selesai');
+    };
+    document.getElementById('btn-no').onclick = function() {
+      tutupDetail();
+    };
+  }
 
     document.getElementById('overlay-detail').style.display = 'flex';
   }
@@ -276,6 +319,25 @@
   function tutupDetail() {
     document.getElementById('overlay-detail').style.display = 'none';
   }
+
+  function updateStatusPesanan(id, status) {
+  fetch('service/update_status.php', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+    body: `id_pesanan=${encodeURIComponent(id)}&status=${encodeURIComponent(status)}`
+  })
+  .then(res => res.json())
+  .then(res => {
+    if (res.success) {
+      pesananData[id].status = status;
+      renderPesanan();
+      tutupDetail();
+    } else {
+      alert('Gagal update status!');
+    }
+  })
+  .catch(() => alert('Terjadi kesalahan jaringan!'));
+}
 </script>
 </body>
 </html>

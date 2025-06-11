@@ -92,13 +92,7 @@
       <label for="deskripsi">Deskripsi:</label>
       <textarea id="deskripsi" name="deskripsi" rows="3" required><?= htmlspecialchars($data['deskripsi']) ?></textarea>
 
-      <?php if (!empty($data['gambar'])): ?>
-          <img src="uploads/<?= htmlspecialchars($data['gambar']) ?>" alt="Gambar Warung" style="width: 100%; border-radius: 10px; margin-bottom: 10px;">
-      <?php endif; ?>
-
-  <label for="gambar">Ganti Gambar:</label>
-  <input type="file" id="gambar" name="gambar">
-     <button type="submit">💾 Simpan Perubahan</button>
+      <button type="submit">💾 Simpan Perubahan</button>
     </form>
   </div>
 </body>

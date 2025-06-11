@@ -23,8 +23,8 @@ if (isset($_POST['PESAN'])) {
 
         // Simpan data pelanggan ke session
         $_SESSION['id_pelanggan'] = $id_pelanggan_baru; // <-- INI YANG PENTING
-        $_SESSION['Nama_pelanggan'] = $Nama;
-        $_SESSION['No_meja'] = $No_meja;
+        $_SESSION['nama_pelanggan'] = $Nama;
+        $_SESSION['no_meja'] = $No_meja;
 
         // redirect ke dashboard
         header("Location: 2_pelanggan.php");

@@ -58,6 +58,23 @@ if (isset($_POST['tambah_ke_keranjang'])) { // Tombol submit memiliki name="tamb
     $result_item = $sql_item->get_result();
     $item_detail = $result_item->fetch_assoc();
 
+    $id_pelanggan = $_SESSION['id_pelanggan'];
+    if (!isset($_SESSION['cart'][$id_pelanggan])) {
+        $_SESSION['cart'][$id_pelanggan] = [];
+    } else {
+        // Cek owner di keranjang
+        $cart = $_SESSION['cart'][$id_pelanggan];
+        if (!empty($cart)) {
+            $cart_owner = $cart[0]['id_owner'];
+            if ($cart_owner != $id_owner_post) {
+                // Jika owner berbeda, bisa tampilkan pesan error atau reset keranjang
+                // Contoh: reset keranjang
+                $_SESSION['cart'][$id_pelanggan] = [];
+                // Atau: die("Keranjang hanya boleh berisi menu dari satu warung!");
+            }
+        }
+    }
+
     if ($item_detail) {
         $new_item = [
             'id_menu' => $item_detail['id_menu'],

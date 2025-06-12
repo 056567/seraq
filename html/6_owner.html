@@ -42,6 +42,12 @@
       color: black;
       font-weight: bold;
       cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .filter-btn:hover {
+      background-color: #009acd;
+      color: white;
     }
 
     .filter-btn.active {
@@ -87,6 +93,13 @@
     .income-item:last-child {
       border-bottom: none;
     }
+    
+    .no-data {
+      text-align: center;
+      color: #aaa;
+      font-style: italic;
+      padding: 20px;
+    }
   </style>
 </head>
 <body>
@@ -105,64 +118,18 @@
   </div>
 
   <div class="summary" id="totalIncome">
-    Total Pemasukan Hari Ini: Rp 150.000
+    Total Pemasukan Hari Ini: Rp 0
   </div>
 
-  <div class="income-list" id="incomeDetails"></div>
+  <div class="income-list" id="incomeDetails">
+    <div class="no-data">Tidak ada data untuk ditampilkan</div>
+  </div>
 
   <script>
-    const chartData = {
-      harian: {
-        labels: ["Mie Ayam", "Nasi Goreng", "Bakso Super", "Es Teh", "Sate Ayam"],
-        data: [28000, 45000, 40000, 24000, 25000],
-        detail: [
-          ["Mie Ayam x2", 28000],
-          ["Nasi Goreng x3", 45000],
-          ["Bakso Super x2", 40000],
-          ["Es Teh x4", 24000],
-          ["Sate Ayam x1", 25000],
-        ],
-        total: "Rp 150.000"
-      },
-      mingguan: {
-        labels: ["Sen", "Sel", "Rab", "Kam", "Jum", "Sab", "Min"],
-        data: [150000, 130000, 170000, 190000, 210000, 200000, 180000],
-        detail: [
-          ["Senin", 150000],
-          ["Selasa", 130000],
-          ["Rabu", 170000],
-          ["Kamis", 190000],
-          ["Jumat", 210000],
-          ["Sabtu", 200000],
-          ["Minggu", 180000],
-        ],
-        total: "Rp 1.230.000"
-      },
-      bulanan: {
-        labels: ["Minggu 1", "Minggu 2", "Minggu 3", "Minggu 4"],
-        data: [500000, 630000, 580000, 670000],
-        detail: [
-          ["Minggu 1", 500000],
-          ["Minggu 2", 630000],
-          ["Minggu 3", 580000],
-          ["Minggu 4", 670000],
-        ],
-        total: "Rp 2.380.000"
-      },
-      tahunan: {
-        labels: ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun"],
-        data: [1800000, 2000000, 1750000, 2200000, 2100000, 1500000],
-        detail: [
-          ["Januari", 1800000],
-          ["Februari", 2000000],
-          ["Maret", 1750000],
-          ["April", 2200000],
-          ["Mei", 2100000],
-          ["Juni", 1500000],
-        ],
-        total: "Rp 11.350.000"
-      }
-    };
+
+    const chartData = chartDataFromPHP; 
+    let mode = 'harian';
+    let selectedKey = Object.keys(chartData.harian)[0] || ""; // Ambil tanggal pertama yang ada
 
     const ctx = document.getElementById('incomeChart').getContext('2d');
     let incomeChart = new Chart(ctx, {
@@ -185,6 +152,7 @@
         },
         scales: {
           y: {
+            beginAtZero: true,
             ticks: {
               callback: value => 'Rp ' + value.toLocaleString('id-ID')
             }
@@ -206,20 +174,31 @@
       incomeChart.update();
 
       // Update summary
-      document.getElementById("totalIncome").innerText = "Total Pemasukan " + capitalize(type) + ": " + selected.total;
+      const typeLabels = {
+        harian: 'Hari Ini',
+        mingguan: 'Minggu Ini',
+        bulanan: 'Bulan Ini',
+        tahunan: 'Tahun Ini'
+      };
+      
+      const total = selected.total.toLocaleString('id-ID');
+      document.getElementById("totalIncome").innerText = 
+        `Total Pemasukan ${typeLabels[type]}: Rp ${total}`;
 
       // Update details
-      const detailHTML = selected.detail.map(item => `
-        <div class="income-item">
-          <span>${item[0]}</span>
-          <span>Rp ${item[1].toLocaleString('id-ID')}</span>
-        </div>
-      `).join("");
-      document.getElementById("incomeDetails").innerHTML = detailHTML;
-    }
-
-    function capitalize(text) {
-      return text.charAt(0).toUpperCase() + text.slice(1);
+      const detailContainer = document.getElementById("incomeDetails");
+      
+      if (selected.detail.length === 0) {
+        detailContainer.innerHTML = '<div class="no-data">Tidak ada data untuk ditampilkan</div>';
+      } else {
+        const detailHTML = selected.detail.map(item => `
+          <div class="income-item">
+            <span>${item[0]}</span>
+            <span>Rp ${item[1].toLocaleString('id-ID')}</span>
+          </div>
+        `).join("");
+        detailContainer.innerHTML = detailHTML;
+      }
     }
 
     // First load
@@ -228,6 +207,3 @@
 
 </body>
 </html>
-
-
-

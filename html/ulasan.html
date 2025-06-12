@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ulasan Warung</title>
+  <style>
+    :root {
+      --primary: #00c8f0;
+      --highlight: #ffd700;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(to bottom, #000d1a, #003366, #0047ab);
+      color: white;
+      padding: 24px;
+      min-height: 100vh;
+    }
+
+    .back-button {
+      display: inline-block;
+      margin-bottom: 24px;
+    }
+
+    .back-button button {
+      padding: 8px 18px;
+      background-color: var(--primary);
+      color: black;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      font-weight: bold;
+    }
+
+    .back-button button:hover {
+      background-color: #00b0d4;
+    }
+
+    h2 {
+      font-size: 26px;
+      margin-bottom: 6px;
+      color: #ffffff;
+    }
+
+    p {
+      margin-bottom: 24px;
+      color: #dddddd;
+    }
+
+    h3 {
+      font-size: 22px;
+      margin-bottom: 16px;
+      color: #ffffff;
+    }
+
+    .ulasan-item {
+      background-color: rgba(255, 255, 255, 0.08); /* disamakan */
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .ulasan-item b {
+      font-size: 16px;
+      color: white;
+    }
+
+    .ulasan-item .nilai {
+      float: right;
+      color: var(--highlight);
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    .ulasan-item .komentar {
+      margin: 8px 0;
+      font-style: italic;
+      color: #eeeeee;
+    }
+
+    .ulasan-item .waktu {
+      font-size: 12px;
+      color: #aaaaaa;
+    }
+
+    @media (max-width: 600px) {
+      .ulasan-item .nilai {
+        float: none;
+        display: block;
+        margin-top: 4px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="back-button">
+    <a href="2_pelanggan.php">
+      <button type="button">← Kembali</button>
+    </a>
+  </div>
+
+  <h2><?= htmlspecialchars($data['nama_warung']) ?></h2>
+  <p><?= htmlspecialchars($data['deskripsi']) ?></p>
+
+  <h3 id="ulasan">Ulasan Pengunjung</h3>
+  <?php if (empty($ulasan_list)): ?>
+    <p>Belum ada ulasan.</p>
+  <?php else: ?>
+    <?php foreach ($ulasan_list as $ulasan): ?>
+      <div class="ulasan-item">
+        <b><?= htmlspecialchars($ulasan['nama_pelanggan']) ?></b>
+        <span class="nilai">★ <?= $ulasan['nilai'] ?></span>
+        <div class="komentar">“<?= htmlspecialchars($ulasan['komentar']) ?>”</div>
+        <div class="waktu"><?= $ulasan['waktu_rating'] ?></div>
+      </div>
+    <?php endforeach; ?>
+  <?php endif; ?>
+
+</body>
+</html>
